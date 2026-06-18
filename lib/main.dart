@@ -18,10 +18,12 @@ void main() async {
 
   SharedPreferences pref = await SharedPreferences.getInstance();
   login = pref.getString('STATUS') ?? "";
-  log("AUTH TOKEN -->" + (pref.getString("AUTHKEY") ?? ""));
-  Utilscontroller utilscontroller = Get.put(Utilscontroller());
-}
+  log("AUTH TOKEN -->${pref.getString("AUTHKEY") ?? ""}");
 
+  Get.put(Utilscontroller());
+
+  runApp(ZodoDoctorApp());
+}
 class ZodoDoctorApp extends StatelessWidget {
   ZodoDoctorApp({super.key});
 

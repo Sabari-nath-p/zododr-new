@@ -1,25 +1,113 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+
 import 'package:flutter/foundation.dart';
-import 'package:get/get.dart';
-import 'package:get/get_navigation/src/extension_navigation.dart';
-import 'package:get/instance_manager.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:zodo_dr/Utils/CustomAlerts.dart';
 import 'package:zodo_dr/Utils/supportModels/responseModel.dart';
 
-enum Api { POST, GET, PATCH, PUT, DELETE }
+enum Api { GET, POST, PUT, PATCH, DELETE }
 
 class ApiService {
-  static String baseUrl = "https://api.zodoai.com/api/";
+  static const String baseUrl = "https://staging.zodoai.com/api/";
 
+  ///----------------------------------------
+  /// AUTH TOKEN
+  ///----------------------------------------
   static Future<String?> getAuthToken() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
+    final pref = await SharedPreferences.getInstance();
     return pref.getString("AUTHKEY");
   }
 
+  ///----------------------------------------
+  /// LOGGER
+  ///----------------------------------------
+  static void _log(String message) {
+    if (kDebugMode) {
+      log(message);
+    }
+  }
+
+  static void _logRequest({
+    required Api method,
+    required Uri url,
+    required Map<String, String> headers,
+    Map<String, dynamic>? body,
+  }) {
+    if (!kDebugMode) return;
+
+    _log("");
+    _log("══════════════════════════════════════════════════════════");
+    _log("🚀 API REQUEST");
+    _log("══════════════════════════════════════════════════════════");
+    _log("METHOD : ${method.name}");
+    _log("URL    : $url");
+
+    _log("HEADERS");
+    headers.forEach((key, value) {
+      _log("  $key : $value");
+    });
+
+    _log("BODY");
+    if (body != null) {
+      _log(const JsonEncoder.withIndent("  ").convert(body));
+    } else {
+      _log("No Body");
+    }
+
+    _log("══════════════════════════════════════════════════════════");
+  }
+
+  static void _logResponse({
+    required Uri url,
+    required http.Response response,
+    required int time,
+  }) {
+    if (!kDebugMode) return;
+
+    _log("");
+    _log("══════════════════════════════════════════════════════════");
+    _log("✅ API RESPONSE");
+    _log("══════════════════════════════════════════════════════════");
+
+    _log("URL         : $url");
+    _log("STATUS CODE : ${response.statusCode}");
+    _log("TIME TAKEN  : ${time} ms");
+
+    _log("HEADERS");
+    response.headers.forEach((key, value) {
+      _log("  $key : $value");
+    });
+
+    _log("BODY");
+
+    try {
+      final decoded = json.decode(response.body);
+      _log(const JsonEncoder.withIndent("  ").convert(decoded));
+    } catch (_) {
+      _log(response.body);
+    }
+
+    _log("══════════════════════════════════════════════════════════");
+  }
+
+  static void _logError(dynamic error) {
+    if (!kDebugMode) return;
+
+    _log("");
+    _log("══════════════════════════════════════════════════════════");
+    _log("❌ API ERROR");
+    _log("══════════════════════════════════════════════════════════");
+    _log(error.toString());
+    _log("══════════════════════════════════════════════════════════");
+  }
+
+  ///----------------------------------------
+  /// MAIN REQUEST
+  ///----------------------------------------
   static Future<void> request({
     required String endpoint,
     Api method = Api.POST,
@@ -33,84 +121,93 @@ class ApiService {
     Function(dynamic error)? onError,
   }) async {
     try {
-      // Prepare URL
-      final Uri uri = Uri.parse('$baseUrl$endpoint');
-      // Prepare headers
-      final Map<String, String> requestHeaders = headers ?? {};
-      requestHeaders['Content-Type'] = 'application/json';
-      requestHeaders["Accept"] = 'application/json';
+      final uri = Uri.parse(baseUrl + endpoint);
 
-      // Add auth token if required
+      final requestHeaders = <String, String>{
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        ...?headers,
+      };
+
       if (requiresAuth) {
-        final String? token = await getAuthToken();
+        final token = await getAuthToken();
+
         if (token != null) {
-          requestHeaders['Authorization'] = 'Bearer $token';
-        } else if (onUnauthenticated != null) {
-          onUnauthenticated();
+          requestHeaders["Authorization"] = "Bearer $token";
+        } else {
+          onUnauthenticated?.call();
           return;
         }
       }
 
-      // Prepare request
+      _logRequest(
+        method: method,
+        url: uri,
+        headers: requestHeaders,
+        body: body,
+      );
+
+      final stopwatch = Stopwatch()..start();
+
       http.Response response;
 
-      // Execute request based on method
       switch (method) {
         case Api.GET:
           response = await http.get(uri, headers: requestHeaders);
           break;
+
         case Api.POST:
           response = await http.post(
             uri,
             headers: requestHeaders,
-            body: body != null ? json.encode(body) : null,
+            body: body != null ? jsonEncode(body) : null,
           );
           break;
+
         case Api.PUT:
           response = await http.put(
             uri,
             headers: requestHeaders,
-            body: body != null ? json.encode(body) : null,
+            body: body != null ? jsonEncode(body) : null,
           );
           break;
-        case Api.DELETE:
-          response = await http.delete(
-            uri,
-            headers: requestHeaders,
-            body: body != null ? json.encode(body) : null,
-          );
-          break;
+
         case Api.PATCH:
           response = await http.patch(
             uri,
             headers: requestHeaders,
-            body: body != null ? json.encode(body) : null,
+            body: body != null ? jsonEncode(body) : null,
           );
           break;
-        default:
-          throw Exception('Unsupported HTTP method: $method');
-      }
-      log("[ ${method} ] $endpoint ==> ${response.statusCode}");
 
-      // Handle response based on status code
-      if (response.statusCode >= 200 && response.statusCode < 300) {
-        // Success response
-        if (onSuccess != null) {
-          onSuccess(
-            ResponseModel(
-              statusCode: response.statusCode,
-              data: json.decode(response.body),
-            ),
+        case Api.DELETE:
+          response = await http.delete(
+            uri,
+            headers: requestHeaders,
+            body: body != null ? jsonEncode(body) : null,
           );
-        }
+          break;
+      }
+
+      stopwatch.stop();
+
+      _logResponse(
+        url: uri,
+        response: response,
+        time: stopwatch.elapsedMilliseconds,
+      );
+
+      final responseData = ResponseModel(
+        statusCode: response.statusCode,
+        data: response.body.isNotEmpty ? jsonDecode(response.body) : null,
+      );
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        onSuccess?.call(responseData);
       } else if (response.statusCode == 401) {
         if (onUnauthenticated != null) {
           onUnauthenticated();
         } else {
-          // Get.offAll(
-          //   () => AuthenticationScreen(),
-          //   transition: Transition.rightToLeft,
-          // );
           Customalerts.errorAlert(
             title: "Session Expired",
             body:
@@ -119,171 +216,31 @@ class ApiService {
         }
       } else if (response.statusCode >= 500) {
         if (onServerError != null) {
-          onServerError(
-            response.statusCode,
-            response.body.isNotEmpty ? response.body : 'Server error occurred',
-          );
+          onServerError(response.statusCode, response.body);
         } else {
           Customalerts.errorAlert(
             title: "Server Error",
-            body: "Something went wrong on our end. Please try again late.",
+            body: "Something went wrong on our end. Please try again later.",
           );
         }
       } else {
-        // Other errors
-
-        if (onSuccess != null) {
-          onSuccess(
-            ResponseModel(
-              statusCode: response.statusCode,
-              data: json.decode(response.body),
-            ),
-          );
-        }
+        onSuccess?.call(responseData);
       }
     } on SocketException catch (e) {
-      // Network error
+      _logError(e);
+
       if (onNetworkError != null) {
-        onNetworkError('Network error: ${e.message}');
+        onNetworkError("Network Error : ${e.message}");
       } else {
         Customalerts.errorAlert(
-          title: "No Internet Connection",
-          body:
-              "You're currently offline. Please check your connection and try again.",
+          title: "No Internet",
+          body: "Please check your internet connection.",
         );
       }
     } catch (e) {
-      // Other errors
-      if (onError != null) {
-        onError(e);
-      }
-      if (kDebugMode) {
-        print('API Request Error: $e');
-      }
+      _logError(e);
+
+      onError?.call(e);
     }
-  }
-
-  // Convenience methods for common HTTP methods
-  Future<void> get({
-    required String endpoint,
-    Map<String, String>? headers,
-    bool requiresAuth = true,
-    Function(dynamic data)? onSuccess,
-    Function()? onUnauthenticated,
-    Function(int statusCode, String message)? onServerError,
-    Function(String message)? onNetworkError,
-    Function(dynamic error)? onError,
-  }) async {
-    await request(
-      endpoint: endpoint,
-      method: Api.GET,
-      headers: headers,
-      requiresAuth: requiresAuth,
-      onSuccess: onSuccess,
-      onUnauthenticated: onUnauthenticated,
-      onServerError: onServerError,
-      onNetworkError: onNetworkError,
-      onError: onError,
-    );
-  }
-
-  Future<void> post({
-    required String endpoint,
-    Map<String, dynamic>? body,
-    Map<String, String>? headers,
-    bool requiresAuth = true,
-    Function(dynamic data)? onSuccess,
-    Function()? onUnauthenticated,
-    Function(int statusCode, String message)? onServerError,
-    Function(String message)? onNetworkError,
-    Function(dynamic error)? onError,
-  }) async {
-    await request(
-      endpoint: endpoint,
-      method: Api.POST,
-      body: body,
-      headers: headers,
-      requiresAuth: requiresAuth,
-      onSuccess: onSuccess,
-      onUnauthenticated: onUnauthenticated,
-      onServerError: onServerError,
-      onNetworkError: onNetworkError,
-      onError: onError,
-    );
-  }
-
-  Future<void> put({
-    required String endpoint,
-    Map<String, dynamic>? body,
-    Map<String, String>? headers,
-    bool requiresAuth = true,
-    Function(dynamic data)? onSuccess,
-    Function()? onUnauthenticated,
-    Function(int statusCode, String message)? onServerError,
-    Function(String message)? onNetworkError,
-    Function(dynamic error)? onError,
-  }) async {
-    await request(
-      endpoint: endpoint,
-      method: Api.PUT,
-      body: body,
-      headers: headers,
-      requiresAuth: requiresAuth,
-      onSuccess: onSuccess,
-      onUnauthenticated: onUnauthenticated,
-      onServerError: onServerError,
-      onNetworkError: onNetworkError,
-      onError: onError,
-    );
-  }
-
-  Future<void> delete({
-    required String endpoint,
-    Map<String, dynamic>? body,
-    Map<String, String>? headers,
-    bool requiresAuth = true,
-    Function(dynamic data)? onSuccess,
-    Function()? onUnauthenticated,
-    Function(int statusCode, String message)? onServerError,
-    Function(String message)? onNetworkError,
-    Function(dynamic error)? onError,
-  }) async {
-    await request(
-      endpoint: endpoint,
-      method: Api.DELETE,
-      body: body,
-      headers: headers,
-      requiresAuth: requiresAuth,
-      onSuccess: onSuccess,
-      onUnauthenticated: onUnauthenticated,
-      onServerError: onServerError,
-      onNetworkError: onNetworkError,
-      onError: onError,
-    );
-  }
-
-  Future<void> patch({
-    required String endpoint,
-    Map<String, dynamic>? body,
-    Map<String, String>? headers,
-    bool requiresAuth = true,
-    Function(dynamic data)? onSuccess,
-    Function()? onUnauthenticated,
-    Function(int statusCode, String message)? onServerError,
-    Function(String message)? onNetworkError,
-    Function(dynamic error)? onError,
-  }) async {
-    await request(
-      endpoint: endpoint,
-      method: Api.PATCH,
-      body: body,
-      headers: headers,
-      requiresAuth: requiresAuth,
-      onSuccess: onSuccess,
-      onUnauthenticated: onUnauthenticated,
-      onServerError: onServerError,
-      onNetworkError: onNetworkError,
-      onError: onError,
-    );
   }
 }
