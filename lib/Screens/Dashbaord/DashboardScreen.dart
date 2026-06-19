@@ -4,12 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:zodo_dr/Screens/Dashbaord/Controller/HomeController.dart';
+import 'package:zodo_dr/Screens/Dashbaord/Model/BookingModel.dart';
 import 'package:zodo_dr/Screens/Dashbaord/Views/DashHeaderView.dart';
 import 'package:zodo_dr/Screens/Dashbaord/Views/HMChatCard.dart';
 import 'package:zodo_dr/Screens/Dashbaord/Views/HMUpcommingadpt.dart'
     show HmupcommingadptCard;
 import 'package:zodo_dr/Screens/Dashbaord/Views/dbToolCardView.dart';
+import 'package:zodo_dr/Screens/MyAppointments/MyAppoinmentScreens.dart';
 import 'package:zodo_dr/Screens/MyEarningScreen/MyEarningScreen.dart';
+import 'package:zodo_dr/Screens/MyProfileScreen/MyProfileScreen.dart';
+import 'package:zodo_dr/Screens/SlotListingScreen/SlotListingScreen.dart';
 import 'package:zodo_dr/Utils/ImagesList.dart';
 import 'package:zodo_dr/Utils/appText.dart';
 import 'package:zodo_dr/Utils/utils.dart';
@@ -51,8 +55,9 @@ class dashBoardScreen extends StatelessWidget {
                           children: [
                             InkWell(
                               onTap: () {
-                                // Get.to(() => MyAppointmentScreen(),
-                                //     transition: Transition.rightToLeft);
+                             
+                                 Get.to(() => MyAppointmentScreen( ),
+                                   transition: Transition.rightToLeft);
                               },
                               child: dbToolCardView(
                                 title: "My Appointments",
@@ -75,8 +80,8 @@ class dashBoardScreen extends StatelessWidget {
                             ),
                             InkWell(
                               onTap: () {
-                                // Get.to(() => SlotListingScreen(),
-                                //     transition: Transition.rightToLeft);
+                                 Get.to(() => SlotListingScreen(),
+                                     transition: Transition.rightToLeft);
                               },
                               child: dbToolCardView(
                                 title: "Appointment Settings",
@@ -86,8 +91,8 @@ class dashBoardScreen extends StatelessWidget {
                             ),
                             InkWell(
                               onTap: () {
-                                // Get.to(() => MyProfileScreen(),
-                                //     transition: Transition.rightToLeft);
+                                Get.to(() => MyProfileScreen(),
+                                   transition: Transition.rightToLeft);
                               },
                               child: dbToolCardView(
                                 title: "Profile",

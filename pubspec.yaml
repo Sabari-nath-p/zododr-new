@@ -49,9 +49,13 @@ dependencies:
   eva_icons_flutter: ^3.1.0
   animated_svg: ^2.1.0
   animate_do: ^4.2.0
-  intl: ^0.20.2
+  intl: ^0.19.0
   syncfusion_flutter_pdfviewer: ^29.2.4
   icons_plus: ^5.0.0
+  horizontal_week_calendar: 
+    # path : /Users/sabarinathp/Downloads/horizontal_week_calendar-0.0.18
+    git:
+      url: https://github.com/Sabari-nath-p/horizontalCalander.git
 
 dev_dependencies:
   flutter_test:

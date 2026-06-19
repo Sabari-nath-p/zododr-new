@@ -66,7 +66,7 @@ Widget _UpCommingCard(BookingModel booking) {
     child: InkWell(
       onTap: () {
         Get.to(
-          () => Appointmentdetailscreen(booking: booking),
+          () => AppointmentDetailScreen(),
           transition: Transition.rightToLeft,
         );
       },
