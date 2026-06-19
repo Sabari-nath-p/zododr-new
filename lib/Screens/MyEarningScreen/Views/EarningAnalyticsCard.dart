@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:zodo_dr/Screens/AppointmentDetailsScreen/Views/PatientDetailsCard.dart';
 import 'package:zodo_dr/utils/appText.dart';
 import 'package:zodo_dr/utils/utils.dart';
 
 class EarningAnalyticsCard extends StatelessWidget {
-  EarningAnalyticsCard({super.key});
+  final String totalEarnings;
+  final String lastSettlement;
+
+  EarningAnalyticsCard({
+    super.key,
+    required this.totalEarnings,
+    required this.lastSettlement,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +35,7 @@ class EarningAnalyticsCard extends StatelessWidget {
               ),
               SpacerH(8.h),
               appText.primaryText(
-                text: "₹ 2,800",
+                text: "₹ $totalEarnings",
                 fontSize: 16.sp,
                 fontWeight: FontWeight.w700,
                 color: Color(0xFF029C5C),
@@ -47,7 +53,7 @@ class EarningAnalyticsCard extends StatelessWidget {
               ),
               SpacerH(8.h),
               appText.primaryText(
-                text: "₹ 2,800",
+                text: "₹ $lastSettlement",
                 fontSize: 16.sp,
                 fontWeight: FontWeight.w700,
                 color: Color(0xFF212121),

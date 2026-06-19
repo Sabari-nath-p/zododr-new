@@ -93,6 +93,7 @@ class AuthenticationController extends GetxController {
       onSuccess: (data) async {
         if (data.statusCode == 201) {
           authToken = data.data["data"]["tokens"]["accessToken"];
+          print("TOKEN = $authToken");
           await setUser();
           if (data.data["data"]["doctor"]["status"] == "pending") {
             Get.offAll(

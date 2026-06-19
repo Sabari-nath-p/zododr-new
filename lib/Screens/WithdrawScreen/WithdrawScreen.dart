@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:zodo_dr/Screens/MyEarningScreen/Controller/Settlementcontroller.dart';
 import 'package:zodo_dr/Screens/MyEarningScreen/Views/EarningAnalyticsCard.dart';
 import 'package:zodo_dr/Screens/MyEarningScreen/Views/EarningInfoCard.dart';
 import 'package:zodo_dr/utils/appButtons.dart';
@@ -11,6 +13,8 @@ import '../MyEarningScreen/Views/MyEarningAppBar.dart';
 
 class Withdrawscreen extends StatelessWidget {
   Withdrawscreen({super.key});
+
+  final Settlementcontroller controller = Get.find<Settlementcontroller>();
 
   @override
   Widget build(BuildContext context) {
@@ -37,14 +41,21 @@ class Withdrawscreen extends StatelessWidget {
                           color: Color(0xFF212121).withOpacity(.7),
                         ),
                         SpacerH(2.h),
-                        appText.primaryText(
-                          text: "₹ 2,8754",
-                          fontSize: 34.sp,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF212121),
+                        Obx(
+                          () => appText.primaryText(
+                            text: "₹ ${controller.balanceAmount.value}",
+                            fontSize: 34.sp,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF212121),
+                          ),
                         ),
                         SpacerH(12.h),
-                        EarningAnalyticsCard(),
+                        Obx(
+                          () => EarningAnalyticsCard(
+                            totalEarnings: controller.totalAmount.value,
+                            lastSettlement: controller.lastSettlement.value,
+                          ),
+                        ),
                         SpacerH(31.h),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,7 +69,9 @@ class Withdrawscreen extends StatelessWidget {
                             SpacerH(10.h),
                             tBox(
                               prefixText: "₹",
-                            ), // use textfield instead fo tbox
+                              controller: controller.withdrawAmountController,
+                              keyType: TextInputType.number,
+                            ),
                             SpacerH(8.h),
                             appText.primaryText(
                               text:
@@ -71,6 +84,7 @@ class Withdrawscreen extends StatelessWidget {
                         ),
                         SpacerH(30.h),
                         EarningInfoCard(),
+                        SpacerH(100.h),
                       ],
                     ),
                   ),
@@ -79,7 +93,17 @@ class Withdrawscreen extends StatelessWidget {
                   bottom: 20.h,
                   right: 25.w,
                   left: 25.w,
-                  child: appButton.PrimaryButton(name: "Proceed"),
+                  child: Obx(
+                    () => appButton.PrimaryButton(
+                      name: "Proceed",
+                      isLoading: controller.isWithdrawSubmitting.value,
+                      onClick: () {
+                        if (!controller.isWithdrawSubmitting.value) {
+                          controller.createSettlement();
+                        }
+                      },
+                    ),
+                  ),
                 ),
               ],
             ),
