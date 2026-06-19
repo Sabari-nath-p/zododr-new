@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:zodo_dr/utils/appText.dart';
 import 'package:zodo_dr/utils/utils.dart';
 
-class MyEarningAppBar extends StatelessWidget {
+class SlotCreateAppBar extends StatelessWidget {
   String name;
-  MyEarningAppBar({super.key, required this.name});
+  VoidCallback? onCalendarTap;
+
+  SlotCreateAppBar({
+    super.key,
+    required this.name,
+    this.onCalendarTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 104.h,
-      //   width: 390.w,
       alignment: Alignment.center,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         image: DecorationImage(
           image: AssetImage("Assets/Images/authgbg.png"),
           fit: BoxFit.cover,
@@ -30,6 +34,7 @@ class MyEarningAppBar extends StatelessWidget {
       ),
       child: Row(
         children: [
+          /// BACK BUTTON
           InkWell(
             onTap: () {
               Navigator.of(context).pop();
@@ -40,12 +45,27 @@ class MyEarningAppBar extends StatelessWidget {
               size: 30.w,
             ),
           ),
+
           SpacerW(10.w),
-          appText.primaryText(
-            text: name,
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-            fontSize: 14.sp,
+
+          /// TITLE
+          Expanded(
+            child: appText.primaryText(
+              text: name,
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+              fontSize: 14.sp,
+            ),
+          ),
+
+          /// CALENDAR ICON (RIGHT SIDE)
+          InkWell(
+            onTap: onCalendarTap,
+            child: Icon(
+              EvaIcons.calendar_outline,
+              color: Colors.white,
+              size: 18.w,
+            ),
           ),
         ],
       ),

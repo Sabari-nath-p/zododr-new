@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:zodo_dr/Utils/Colors.dart';
 
 
 Widget buildDayCard({
@@ -24,15 +26,15 @@ Widget buildDayCard({
       children: [
         /// Header
         Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 14,
+          padding:  EdgeInsets.symmetric(
+            horizontal: 16.w,
+            vertical: 12.h,
           ),
           decoration: BoxDecoration(
-            color: const Color(0xff1CA7EC).withOpacity(.08),
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(12),
-              topRight: Radius.circular(12),
+             color:  AppColors.PrimaryColor.withOpacity(.1),
+            borderRadius:  BorderRadius.only(
+              topLeft: Radius.circular(12.r),
+              topRight: Radius.circular(12.r),
             ),
           ),
           child: Row(
@@ -40,22 +42,23 @@ Widget buildDayCard({
               Expanded(
                 child: Text(
                   day,
-                  style: const TextStyle(
-                    fontSize: 16,
+                  style:  TextStyle(
+                    fontSize: 14.sp,
                     fontWeight: FontWeight.w600,
+                    color: Colors.black
                   ),
                 ),
               ),
 
               InkWell(
                 onTap: onAdd,
-                borderRadius: BorderRadius.circular(30),
-                child: const Padding(
+                borderRadius: BorderRadius.circular(30.r),
+                child: Padding(
                   padding: EdgeInsets.all(4),
                   child: Icon(
                     Icons.add_circle_outline,
-                    color: Color(0xff1CA7EC),
-                    size: 25,
+                    color:Colors.black,
+                    size: 20.sp,
                   ),
                 ),
               ),
@@ -66,7 +69,7 @@ Widget buildDayCard({
         /// Slots
         if (timeSlots.isEmpty)
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20),
+            padding:  EdgeInsets.symmetric(vertical: 10.h),
             child: Text(
               "No time slots available",
               style: TextStyle(
@@ -89,9 +92,9 @@ Widget buildTimeSlotTile({
   VoidCallback? onDelete,
 }) {
   return Container(
-    padding: const EdgeInsets.symmetric(
-      horizontal: 16,
-      vertical: 14,
+    padding:  EdgeInsets.symmetric(
+      horizontal: 16.w,
+      vertical: 10.h,
     ),
     decoration: BoxDecoration(
       border: Border(
@@ -102,10 +105,10 @@ Widget buildTimeSlotTile({
     ),
     child: Row(
       children: [
-        const Icon(
+        Icon(
           Icons.access_time_rounded,
           color: Color(0xff1CA7EC),
-          size: 20,
+          size: 18.sp,
         ),
 
         const SizedBox(width: 10),
@@ -113,8 +116,8 @@ Widget buildTimeSlotTile({
         Expanded(
           child: Text(
             "$startTime - $endTime",
-            style: const TextStyle(
-              fontSize: 15,
+            style:  TextStyle(
+              fontSize: 14.sp,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -127,7 +130,7 @@ Widget buildTimeSlotTile({
             padding: const EdgeInsets.all(6),
             child: Icon(
               Icons.edit_rounded,
-              size: 20,
+              size: 18.sp,
               color: Colors.blue.shade600,
             ),
           ),

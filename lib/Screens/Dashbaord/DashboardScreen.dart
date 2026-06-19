@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:zodo_dr/Screens/CreateSlotScreen/CreateSlotScreen.dart';
 import 'package:zodo_dr/Screens/Dashbaord/Controller/HomeController.dart';
 import 'package:zodo_dr/Screens/Dashbaord/Model/BookingModel.dart';
 import 'package:zodo_dr/Screens/Dashbaord/Views/DashHeaderView.dart';
@@ -80,7 +81,7 @@ class dashBoardScreen extends StatelessWidget {
                             ),
                             InkWell(
                               onTap: () {
-                                 Get.to(() => SlotListingScreen(),
+                                 Get.to(() => CreateSlotScreen(),
                                      transition: Transition.rightToLeft);
                               },
                               child: dbToolCardView(
@@ -104,8 +105,7 @@ class dashBoardScreen extends StatelessWidget {
                         ),
                       ),
                       SpacerH(12.h),
-                      Hmchatcard(),
-                      SpacerH(12.h),
+                      
                     ],
                   ),
                 ),

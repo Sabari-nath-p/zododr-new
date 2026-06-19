@@ -8,7 +8,7 @@ import 'package:zodo_dr/Utils/appText.dart';
 
 class SCCalenderCard extends StatelessWidget {
   SCCalenderCard({super.key});
-  CSController ctrl = Get.put(CSController());
+  CreateSlotController ctrl = Get.put(CreateSlotController());
   @override
   Widget build(BuildContext context) {
     return Container(
