@@ -90,29 +90,52 @@ class AuthenticationController extends GetxController {
       method: Api.POST,
       body: {"user_id": userID, "otp": otp},
       requiresAuth: false,
-      onSuccess: (data) async {
-        if (data.statusCode == 201) {
-          authToken = data.data["data"]["tokens"]["accessToken"];
-          await setUser();
-          if (data.data["data"]["doctor"]["status"] == "pending") {
-            Get.offAll(
-              () => VerificationScreen(),
-              transition: Transition.rightToLeft,
-            );
-          } else {
-            Get.offAll(
-              () => dashBoardScreen(),
-              transition: Transition.rightToLeft,
-            );
-          }
-        } else {
-          Customalerts.errorAlert(
-            title: "Incorrrect OTP",
-            body: "Please enter correct otp",
-          );
-          return false;
-        }
-      },
+       onSuccess: (data) async {
+  if (data.statusCode == 201) {
+    authToken = data.data["data"]["tokens"]["accessToken"];
+
+    final pref = await SharedPreferences.getInstance();
+
+    final doctor = data.data["data"]["doctor"];
+
+    if (doctor != null && doctor["id"] != null) {
+      final doctorId = doctor["id"];
+
+      await pref.setString("DOCTOR_ID", doctorId);
+    }
+
+    await pref.setString("AUTHKEY", authToken);
+    await pref.setString("STATUS", "IN");
+
+    // optional user id save
+    final user = data.data["data"]["user"];
+    if (user != null && user["id"] != null) {
+      await pref.setString("USERID", user["id"]);
+    }
+
+    print("TOKEN = $authToken");
+
+    await setUser();
+
+    if (doctor != null && doctor["status"] == "pending") {
+      Get.offAll(
+        () => VerificationScreen(),
+        transition: Transition.rightToLeft,
+      );
+    } else {
+      Get.offAll(
+        () => dashBoardScreen(),
+        transition: Transition.rightToLeft,
+      );
+    }
+  } else {
+    Customalerts.errorAlert(
+      title: "Incorrect OTP",
+      body: "Please enter correct OTP",
+    );
+    return;
+  }
+},
       onUnauthenticated: () {
         Customalerts.errorAlert(
           title: "Incorrrect OTP",

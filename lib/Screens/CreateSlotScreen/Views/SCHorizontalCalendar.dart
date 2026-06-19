@@ -15,11 +15,18 @@ class SCHorizontalCalendar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dates = List.generate(
-      30,
-      (index) => DateTime.now().add(Duration(days: index)),
-    );
+     final DateTime today = DateTime.now();
 
+// start 2 years back from current month
+final DateTime startDate = DateTime(today.year - 2, today.month, 1);
+
+// total ~4 years range (adjust if needed)
+final int totalDays = 365 * 4;
+
+final dates = List.generate(
+  totalDays,
+  (index) => startDate.add(Duration(days: index)),
+);
     return Container(
       padding: EdgeInsets.symmetric(vertical: 10.h),
       decoration: BoxDecoration(
@@ -81,14 +88,16 @@ class SCHorizontalCalendar extends StatelessWidget {
                     duration: const Duration(milliseconds: 250),
                     width: 45.w,
                     decoration: BoxDecoration(
-                      color: isSelected
-                          ? AppColors.PrimaryColor
-                          : Colors.grey.shade100,
+                      color:
+                          isSelected
+                              ? AppColors.PrimaryColor
+                              : Colors.grey.shade100,
                       borderRadius: BorderRadius.circular(10.r),
                       border: Border.all(
-                        color: isSelected
-                            ? AppColors.PrimaryColor
-                            : Colors.grey.shade300,
+                        color:
+                            isSelected
+                                ? AppColors.PrimaryColor
+                                : Colors.grey.shade300,
                       ),
                     ),
                     child: Column(
@@ -97,9 +106,7 @@ class SCHorizontalCalendar extends StatelessWidget {
                         Text(
                           DateFormat("EEE").format(date),
                           style: TextStyle(
-                            color: isSelected
-                                ? Colors.white
-                                : Colors.grey,
+                            color: isSelected ? Colors.white : Colors.grey,
                             fontSize: 9.sp,
                             fontWeight: FontWeight.w500,
                           ),
@@ -110,9 +117,7 @@ class SCHorizontalCalendar extends StatelessWidget {
                         Text(
                           "${date.day}",
                           style: TextStyle(
-                            color: isSelected
-                                ? Colors.white
-                                : Colors.black,
+                            color: isSelected ? Colors.white : Colors.black,
                             fontSize: 12.sp,
                             fontWeight: FontWeight.bold,
                           ),
@@ -123,9 +128,7 @@ class SCHorizontalCalendar extends StatelessWidget {
                         Text(
                           DateFormat("MMM").format(date),
                           style: TextStyle(
-                            color: isSelected
-                                ? Colors.white70
-                                : Colors.grey,
+                            color: isSelected ? Colors.white70 : Colors.grey,
                             fontSize: 10.sp,
                           ),
                         ),
@@ -141,10 +144,7 @@ class SCHorizontalCalendar extends StatelessWidget {
 
           Container(
             margin: EdgeInsets.symmetric(horizontal: 16.w),
-            padding: EdgeInsets.symmetric(
-              horizontal: 14.w,
-              vertical: 10.h,
-            ),
+            padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
             decoration: BoxDecoration(
               color: AppColors.PrimaryColor.withOpacity(.08),
               borderRadius: BorderRadius.circular(12.r),

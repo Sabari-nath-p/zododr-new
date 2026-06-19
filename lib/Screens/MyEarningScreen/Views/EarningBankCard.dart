@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:zodo_dr/Screens/AppointmentDetailsScreen/Views/PatientDetailsCard.dart';
 import 'package:zodo_dr/utils/appText.dart';
 import 'package:zodo_dr/utils/utils.dart';
 
 class EarningBankCard extends StatelessWidget {
-  const EarningBankCard({super.key});
+  final String bankName;
+  final String maskedAccountNumber;
+
+  const EarningBankCard({
+    super.key,
+    required this.bankName,
+    required this.maskedAccountNumber,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -32,14 +38,14 @@ class EarningBankCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               appText.primaryText(
-                text: "HDFC Bank",
+                text: bankName,
                 fontSize: 12.sp,
                 fontWeight: FontWeight.w700,
                 color: Color(0xFF424A53),
               ),
               SpacerH(2.h),
               appText.primaryText(
-                text: "2034 **** **** ****945",
+                text: maskedAccountNumber,
                 fontSize: 10.sp,
                 fontWeight: FontWeight.w600,
                 color: Color(0xFF424A53),

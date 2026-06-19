@@ -18,6 +18,7 @@ import 'package:zodo_dr/Screens/SlotListingScreen/SlotListingScreen.dart';
 import 'package:zodo_dr/Utils/ImagesList.dart';
 import 'package:zodo_dr/Utils/appText.dart';
 import 'package:zodo_dr/Utils/utils.dart';
+import 'package:zodo_dr/Screens/ProfileScreen/ProfileScreen.dart';
 
 class dashBoardScreen extends StatelessWidget {
   dashBoardScreen({super.key});
@@ -92,8 +93,10 @@ class dashBoardScreen extends StatelessWidget {
                             ),
                             InkWell(
                               onTap: () {
-                                Get.to(() => MyProfileScreen(),
-                                   transition: Transition.rightToLeft);
+                                Get.to(
+                                  () => ProfileScreen(),
+                                  transition: Transition.rightToLeft,
+                                );
                               },
                               child: dbToolCardView(
                                 title: "Profile",
