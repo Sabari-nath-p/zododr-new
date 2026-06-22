@@ -11,6 +11,7 @@ class Homecontroller extends GetxController {
   List<BookingModel> bookings = [];
 
   fetchTodayBooking() async {
+     if (utils.user?.id == null) return;
     print(await ApiService.getAuthToken());
     ApiService.request(
       endpoint:

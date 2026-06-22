@@ -43,7 +43,7 @@ class DashHeaderView extends StatelessWidget {
                 ),
                 SpacerH(2.h),
                 appText.primaryText(
-                  text: "Hi , ${ctrl.utils.user!.name}",
+                 text: "Hi , ${ctrl.utils.user?.name ?? ''}",
                   fontSize: 15.sp,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
