@@ -11,7 +11,7 @@ class Appointmentdetailsscreenappbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 100.h,
+    
       //   width: 390.w,
       alignment: Alignment.center,
       decoration: BoxDecoration(
@@ -21,7 +21,7 @@ class Appointmentdetailsscreenappbar extends StatelessWidget {
         //     fit: BoxFit.cover)
       ),
       padding: EdgeInsets.only(
-        top: 48.h,
+        top: 10.h,
         bottom: 14.h,
         left: 20.w,
         right: 20.w,
@@ -35,7 +35,7 @@ class Appointmentdetailsscreenappbar extends StatelessWidget {
             child: Icon(
               Icons.arrow_back_ios_new,
               // color: Colors.white,
-              size: 30.w,
+              size: 20.w,
             ),
           ),
           SpacerW(10.w),

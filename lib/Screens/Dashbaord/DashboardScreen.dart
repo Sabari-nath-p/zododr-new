@@ -20,8 +20,8 @@ import 'package:zodo_dr/Utils/appText.dart';
 import 'package:zodo_dr/Utils/utils.dart';
 import 'package:zodo_dr/Screens/ProfileScreen/ProfileScreen.dart';
 
-class dashBoardScreen extends StatelessWidget {
-  dashBoardScreen({super.key});
+class DashBoardScreen extends StatelessWidget {
+  DashBoardScreen({super.key});
   Homecontroller ctrl = Get.put(Homecontroller());
   @override
   Widget build(BuildContext context) {
@@ -39,6 +39,7 @@ class dashBoardScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SpacerH(20.h),
+                      
                       HmupcommingadptCard(),
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16.w),

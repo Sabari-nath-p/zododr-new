@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:zodo_dr/Screens/Dashbaord/Model/BookingModel.dart';
 import 'package:zodo_dr/Utils/appText.dart';
 import 'package:zodo_dr/Utils/utils.dart' show SpacerH, SpacerW;
 
-
 class PatientdetailCard extends StatelessWidget {
-  const PatientdetailCard({super.key});
+  final BookingModel booking;
+  const PatientdetailCard({super.key, required this.booking});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +15,9 @@ class PatientdetailCard extends StatelessWidget {
       height: 119.h,
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16), color: Color(0xffF8F9FE)),
+        borderRadius: BorderRadius.circular(16),
+        color: Color(0xffF8F9FE),
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -39,26 +42,29 @@ class PatientdetailCard extends StatelessWidget {
                       alignment: Alignment.center,
                       height: 23.h,
                       decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          color: Color(0xffBFD9F7)),
+                        borderRadius: BorderRadius.circular(5),
+                        color: Color(0xffBFD9F7),
+                      ),
                       child: appText.primaryText(
-                          text: "New Consultation".toUpperCase(),
-                          fontSize: 10.sp,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xff2C78CF)),
-                    )
+                        text: (booking.type ?? "Consultation").toUpperCase(),
+                        fontSize: 10.sp,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xff2C78CF),
+                      ),
+                    ),
                   ],
                 ),
                 SpacerH(10.h),
                 appText.primaryText(
-                    text: "Kevin Sam Mathew",
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600),
+                  text: booking.userDetails?.name ?? "Unknown Patient",
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w600,
+                ),
                 SpacerH(10.h),
                 Row(
                   children: [
                     appText.primaryText(
-                      text: "F",
+                      text: booking.userDetails?.gender ?? "-",
                       fontSize: 14.sp,
                       fontWeight: FontWeight.w600,
                       color: Colors.black,
@@ -72,53 +78,15 @@ class PatientdetailCard extends StatelessWidget {
                     ),
                     SpacerW(12.w),
                     appText.primaryText(
-                      text: "24",
+                      text: booking.userDetails?.age?.toString() ?? "-",
                       fontSize: 14.sp,
                       fontWeight: FontWeight.w600,
-                    ),
-                    appText.primaryText(
-                      text: " yr",
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xff8C8C8C),
                     ),
                     SpacerW(12.w),
                     appText.primaryText(
-                      text: "-",
+                      text: "year",
                       fontSize: 14.sp,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xff8C8C8C),
-                    ),
-                    SpacerW(12.w),
-                    appText.primaryText(
-                      text: "178",
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    appText.primaryText(
-                      text: " cm",
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xff8C8C8C),
-                    ),
-                    SpacerW(12.w),
-                    appText.primaryText(
-                      text: "-",
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xff8C8C8C),
-                    ),
-                    SpacerW(12.w),
-                    appText.primaryText(
-                      text: "55",
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    appText.primaryText(
-                      text: "kg",
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xff8C8C8C),
                     ),
                   ],
                 ),
@@ -132,7 +100,7 @@ class PatientdetailCard extends StatelessWidget {
               Icons.video_camera_back_rounded,
               color: Color(0xff276AB8),
             ),
-          )
+          ),
         ],
       ),
     );

@@ -124,7 +124,7 @@ class AuthenticationController extends GetxController {
       );
     } else {
       Get.offAll(
-        () => dashBoardScreen(),
+        () => DashBoardScreen(),
         transition: Transition.rightToLeft,
       );
     }

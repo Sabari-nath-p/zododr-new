@@ -14,17 +14,11 @@ enum Api { GET, POST, PUT, PATCH, DELETE }
 class ApiService {
   static const String baseUrl = "https://staging.zodoai.com/api/";
 
-  ///----------------------------------------
-  /// AUTH TOKEN
-  ///----------------------------------------
   static Future<String?> getAuthToken() async {
     final pref = await SharedPreferences.getInstance();
     return pref.getString("AUTHKEY");
   }
 
-  ///----------------------------------------
-  /// LOGGER
-  ///----------------------------------------
   static void _log(String message) {
     if (kDebugMode) {
       log(message);
@@ -38,27 +32,13 @@ class ApiService {
     Map<String, dynamic>? body,
   }) {
     if (!kDebugMode) return;
-
-    _log("");
-    _log("══════════════════════════════════════════════════════════");
-    _log("🚀 API REQUEST");
-    _log("══════════════════════════════════════════════════════════");
-    _log("METHOD : ${method.name}");
-    _log("URL    : $url");
-
-    _log("HEADERS");
     headers.forEach((key, value) {
       _log("  $key : $value");
     });
 
-    _log("BODY");
     if (body != null) {
       _log(const JsonEncoder.withIndent("  ").convert(body));
-    } else {
-      _log("No Body");
-    }
-
-    _log("══════════════════════════════════════════════════════════");
+    } else {}
   }
 
   static void _logResponse({
@@ -68,41 +48,15 @@ class ApiService {
   }) {
     if (!kDebugMode) return;
 
-    _log("");
-    _log("══════════════════════════════════════════════════════════");
-    _log("✅ API RESPONSE");
-    _log("══════════════════════════════════════════════════════════");
-
-    _log("URL         : $url");
-    _log("STATUS CODE : ${response.statusCode}");
-    _log("TIME TAKEN  : ${time} ms");
-
-    _log("HEADERS");
-    response.headers.forEach((key, value) {
-      _log("  $key : $value");
-    });
-
-    _log("BODY");
+    response.headers.forEach((key, value) {});
 
     try {
       final decoded = json.decode(response.body);
-      _log(const JsonEncoder.withIndent("  ").convert(decoded));
-    } catch (_) {
-      _log(response.body);
-    }
-
-    _log("══════════════════════════════════════════════════════════");
+    } catch (_) {}
   }
 
   static void _logError(dynamic error) {
     if (!kDebugMode) return;
-
-    _log("");
-    _log("══════════════════════════════════════════════════════════");
-    _log("❌ API ERROR");
-    _log("══════════════════════════════════════════════════════════");
-    _log(error.toString());
-    _log("══════════════════════════════════════════════════════════");
   }
 
   ///----------------------------------------
@@ -139,13 +93,6 @@ class ApiService {
           return;
         }
       }
-
-      _logRequest(
-        method: method,
-        url: uri,
-        headers: requestHeaders,
-        body: body,
-      );
 
       final stopwatch = Stopwatch()..start();
 
@@ -191,12 +138,6 @@ class ApiService {
 
       stopwatch.stop();
 
-      _logResponse(
-        url: uri,
-        response: response,
-        time: stopwatch.elapsedMilliseconds,
-      );
-
       final responseData = ResponseModel(
         statusCode: response.statusCode,
         data: response.body.isNotEmpty ? jsonDecode(response.body) : null,
@@ -227,8 +168,6 @@ class ApiService {
         onSuccess?.call(responseData);
       }
     } on SocketException catch (e) {
-      _logError(e);
-
       if (onNetworkError != null) {
         onNetworkError("Network Error : ${e.message}");
       } else {
@@ -238,8 +177,6 @@ class ApiService {
         );
       }
     } catch (e) {
-      _logError(e);
-
       onError?.call(e);
     }
   }

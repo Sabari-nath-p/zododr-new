@@ -1,41 +1,50 @@
 import 'package:flutter/material.dart';
-//import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
+import 'package:jitsi_meet_flutter_sdk/jitsi_meet_flutter_sdk.dart';
 
-class VideoCallScreen extends StatefulWidget {
-  VideoCallScreen({super.key});
+final JitsiMeet jitsiMeet = JitsiMeet();
 
-  @override
-  State<VideoCallScreen> createState() => _VideoCallScreenState();
-}
+Future<void> videoCallScreen({
+  required String bookingId,
+  required String userName,
+}) async {
+  try {
+    final options = JitsiMeetConferenceOptions(
+      serverURL: "https://meet.palqar.cloud",
+      room: bookingId,
 
-class _VideoCallScreenState extends State<VideoCallScreen> {
-  @override
-  void initState() {
-    super.initState();
-    // initAgora();
-  }
+      configOverrides: {
+        "startWithAudioMuted": false,
+        "startWithVideoMuted": false,
+        "prejoinPageEnabled": false,
+        "disableInviteFunctions": true,
+      },
 
-  void initAgora() async {}
+      featureFlags: {
+        "invite.enabled": false,
+        "add-people.enabled": false,
+        "meeting-name.enabled": false,
+        "chat.enabled": true,
+        "recording.enabled": false,
+        "live-streaming.enabled": false,
+        "tile-view.enabled": false,
+        "pip.enabled": true,
+        "call-integration.enabled": false,
+        "unsaferoomwarning.enabled": false,
+        "welcomepage.enabled": false,
+        "help.enabled": false,
+        "settings.enabled": false,
+        "toolbox.alwaysVisible": false,
+        "breakout-rooms.enabled": false,
+        "participants-pane.enabled": false,
+      },
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          // Expanded(
-          //   child: ZegoUIKitPrebuiltCall(
-          //     appID: 396540246, // your AppID,
-          //     appSign:
-          //         "87dcda660c75384f1da157755edd56a02434db236dd25d2fec434f7441e48488",
-          //     userID: "sabarinath-P",
-          //     userName: "Sabarinath P",
-          //     callID: "3111",
-
-          //     config: ZegoUIKitPrebuiltCallConfig.oneOnOneVideoCall(),
-          //   ),
-          // )
-        ],
+      userInfo: JitsiMeetUserInfo(
+        displayName: userName,
       ),
     );
+
+    await jitsiMeet.join(options);
+  } catch (e) {
+    debugPrint("Jitsi Error: $e");
   }
 }

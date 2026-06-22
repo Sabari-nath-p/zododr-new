@@ -99,7 +99,7 @@ class ZodoDoctorApp extends StatelessWidget {
           ),
           home:
               (login == "IN")
-                  ? dashBoardScreen()
+                  ? DashBoardScreen()
                   : (login == "pending")
                   ? VerificationScreen()
                   : AuthenticationScreen(),

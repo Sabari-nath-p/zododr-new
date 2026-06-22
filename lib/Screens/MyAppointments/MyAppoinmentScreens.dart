@@ -9,86 +9,132 @@ import 'package:zodo_dr/Screens/MyAppointments/Views/myApponmentCalender.dart';
 import 'package:zodo_dr/Utils/appText.dart';
 import 'package:zodo_dr/Utils/utils.dart';
 
-
 class MyAppointmentScreen extends StatelessWidget {
-
-
-  
-  MyAppointmentScreen({super.key,});
-  Myappointmentcontroller controller = Get.put(Myappointmentcontroller());
+  MyAppointmentScreen({super.key});
+  MyAppointmentController controller = Get.put(MyAppointmentController());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: GetBuilder<Myappointmentcontroller>(builder: (controller) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            AppointmentAppBar(),
-            SpacerH(20.h),
-            Expanded(
-                child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SpacerW(395),
-                  Container(
-                    width: 361.w,
-                    height: 50.h,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(7),
-                        color: Color(0xff787880).withOpacity(.12)),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _appointmentMenu(controller.selected == 0, name: "New"),
-                        _appointmentMenu(controller.selected == 1, name: "History")
-                      ],
-                    ),
-                  ),
-                  SpacerH(16.h),
-                  MyAppointmentCalender(),
-                  for (int i = 0; i < 10; i++) 
-                  MyappointmentsListCard()
-                ],
+      body: GetBuilder<MyAppointmentController>(
+        builder: (controller) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              AppointmentAppBar(),
+              SpacerH(20.h),
+              Expanded(
+                child:
+                    controller.isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              SpacerW(395),
+                              Container(
+                                width: 361.w,
+                                height: 50.h,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(7),
+                                  color: const Color(
+                                    0xff787880,
+                                  ).withOpacity(.12),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    _appointmentMenu(
+                                      controller.selected == 0,
+                                      index: 0,
+                                      name: "New",
+                                    ),
+                                    _appointmentMenu(
+                                      controller.selected == 1,
+                                      index: 1,
+                                      name: "History",
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SpacerH(16.h),
+                           MyAppointmentCalender(
+  selectedDate: controller.selectedDate ?? DateTime.now(),
+  onDateSelected: controller.changeDate,
+),
+
+                              if (controller.bookings.isEmpty)
+                                Padding(
+                                  padding: EdgeInsets.only(top: 100.h),
+                                  child: appText.primaryText(
+                                    text: "No Appointments Found",
+                                    fontSize: 15.sp,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                )
+                              else
+                                ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: controller.bookings.length,
+                                  itemBuilder: (context, index) {
+                                    final booking = controller.bookings[index];
+
+                                    return Padding(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 16.w,
+                                      ),
+                                      child: MyappointmentsListCard(
+                                        booking: booking,
+                                      ),
+                                    );
+                                  },
+                                ),
+                            ],
+                          ),
+                        ),
               ),
-            ))
-          ],
-        );
-      }),
+            ],
+          );
+        },
+      ),
     );
   }
 }
 
-Widget _appointmentMenu(bool selected, {String name = "button"}) {
+Widget _appointmentMenu(
+  bool selected, {
+  required int index,
+  String name = "button",
+}) {
   return InkWell(
     onTap: () {
-      Myappointmentcontroller controller = Get.put(Myappointmentcontroller());
-      if (controller.selected == 1) {
-        controller.selected = 0;
-      } else {
-        controller.selected = 1;
-      }
-      controller.update();
+      final controller = Get.find<MyAppointmentController>();
+      controller.changeTab(index);
     },
     child: Container(
       width: 178.1.w,
       height: 46.h,
       alignment: Alignment.center,
-      decoration: (!selected)
-          ? null
-          : BoxDecoration(
-              borderRadius: BorderRadius.circular(7),
-              color: Colors.white,
-              boxShadow: [
+      decoration:
+          selected
+              ? BoxDecoration(
+                borderRadius: BorderRadius.circular(7),
+                color: Colors.white,
+                boxShadow: [
                   BoxShadow(
-                      blurRadius: 8,
-                      spreadRadius: 0,
-                      offset: Offset(0, 3),
-                      color: Colors.black.withOpacity(.01))
-                ]),
+                    blurRadius: 8,
+                    spreadRadius: 0,
+                    offset: const Offset(0, 3),
+                    color: Colors.black.withOpacity(.01),
+                  ),
+                ],
+              )
+              : null,
       child: appText.primaryText(
-          text: name, fontSize: 13.sp, fontWeight: FontWeight.w500),
+        text: name,
+        fontSize: 13.sp,
+        fontWeight: FontWeight.w500,
+      ),
     ),
   );
 }

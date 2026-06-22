@@ -3,9 +3,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zodo_dr/Screens/AuthenticationScreen/AuthenticationScreen.dart';
 import 'package:zodo_dr/Screens/Dashbaord/Controller/HomeController.dart';
 import 'package:zodo_dr/Utils/appText.dart' show appText;
 import 'package:zodo_dr/Utils/utils.dart';
+import 'package:zodo_dr/main.dart' as AppRoutes;
 
 class DashHeaderView extends StatelessWidget {
   DashHeaderView({super.key});
@@ -51,11 +54,93 @@ class DashHeaderView extends StatelessWidget {
               ],
             ),
           ),
-          Icon(EvaIcons.settings2Outline, size: 28.w, color: Colors.white),
+         PopupMenuButton<String>(
+  color: Colors.white,
+  offset: const Offset(0, 45),
+  icon: Icon(
+    EvaIcons.settings2Outline,
+    size: 28.w,
+    color: Colors.white,
+  ),
+  onSelected: (value) {
+    if (value == "logout") {
+      _showLogoutDialog(context);
+    }
+  },
+  itemBuilder: (context) => [
+    PopupMenuItem(
+      value: "logout",
+      child: Row(
+        children: [
+          const Icon(
+            Icons.logout_rounded,
+            color: Colors.red,
+          ),
+          SizedBox(width: 10.w),
+          const Text("Logout"),
+        ],
+      ),
+    ),
+  ],
+),
           SpacerW(12.w),
           Icon(EvaIcons.bellOutline, size: 28.w, color: Colors.white),
         ],
       ),
     );
   }
+}
+void _showLogoutDialog(BuildContext context) {
+  Get.dialog(
+    AlertDialog(
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      title: Text(
+        "Logout",
+        style: TextStyle(
+          fontSize: 16.sp,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      content: Text(
+        "Are you sure you want to log out of your account?",
+        style: TextStyle(
+          fontSize: 13.sp,
+          color: Colors.black87,
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Get.back(),
+          child: Text(
+            "Cancel",
+            style: TextStyle(
+              color: Colors.grey,
+              fontSize: 14.sp,
+            ),
+          ),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.r),
+            ),
+          ),
+          onPressed: () async {
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.clear();
+
+           Get.offAll(() => AuthenticationScreen());
+          },
+          child: const Text(
+            "Logout",
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      ],
+    ),
+  );
 }

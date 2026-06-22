@@ -1,37 +1,67 @@
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:intl/intl.dart';
 import 'package:zodo_dr/Screens/Dashbaord/Model/BookingModel.dart';
 import 'package:zodo_dr/Utils/UtilsController.dart';
 import 'package:zodo_dr/Utils/apiHandler.dart';
 
 class Homecontroller extends GetxController {
-  Utilscontroller utils = Get.find();
+  final Utilscontroller utils = Get.find();
+
   List<BookingModel> bookings = [];
+  bool isLoading = false;
 
-  fetchTodayBooking() async {
-     if (utils.user?.id == null) return;
-    print(await ApiService.getAuthToken());
-    ApiService.request(
-      endpoint:
-          "bookings/doctor/${utils.user!.id}/bookings?page=1&limit=100&appointmentDate=${DateFormat("yyyy-MM-dd").format(DateTime.now())} d",
-      method: Api.GET,
+  Future<void> fetchTodayBooking() async {
+  print("===== fetchTodayBooking =====");
+  print("User: ${utils.user}");
+  print("User ID: ${utils.user?.id}");
 
-      onSuccess: (data) {
-        for (var data in data.data["data"]) {
-          bookings.add(BookingModel.fromJson(data));
-        }
-
-        update();
-      },
-    );
+  if (utils.user?.id == null) {
+    print("User ID is null");
+    return;
   }
+
+  isLoading = true;
+  bookings.clear();
+  update();
+
+  final endpoint =
+      "bookings/doctor/${utils.user!.id}/bookings?page=1&limit=100&appointmentDate=${DateFormat('yyyy-MM-dd').format(DateTime.now())}";
+
+  print(endpoint);
+
+  ApiService.request(
+    endpoint: endpoint,
+    method: Api.GET,
+    onSuccess: (response) {
+      print(response.data);
+
+      bookings.clear();
+
+      for (final item in response.data["data"]) {
+        bookings.add(BookingModel.fromJson(item));
+      }
+
+      print("Bookings: ${bookings.length}");
+
+      isLoading = false;
+      update();
+    },
+    onError: (error) {
+      print(error);
+
+      bookings.clear();
+      isLoading = false;
+      update();
+    },
+  );
+}
 
   @override
-  void onInit() {
-    // TODO: implement onInit
-    super.onInit();
-    fetchTodayBooking();
-  }
+void onInit() {
+  super.onInit();
+
+  print("HomeController onInit");
+
+  fetchTodayBooking();
+}
 }
