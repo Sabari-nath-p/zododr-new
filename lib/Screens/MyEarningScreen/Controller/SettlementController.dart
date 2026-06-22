@@ -24,7 +24,6 @@ class Settlementcontroller extends GetxController {
   RxString requestedAmount = "0".obs;
 
   // NOTE: No "Last Settlement" field exists in the wallet API response.
-  
   RxString lastSettlement = "0".obs;
 
   // Bank state (read from doctor profile, not a separate API)
@@ -33,6 +32,14 @@ class Settlementcontroller extends GetxController {
   // Action loading flags
   RxBool isBankSubmitting = false.obs;
   RxBool isWithdrawSubmitting = false.obs;
+
+  // ---------------------------------------------------------
+  // SETTLEMENTS LIST (Payment History) — real API data
+  // ---------------------------------------------------------
+  RxList<dynamic> settlementsList = <dynamic>[].obs;
+  RxBool isSettlementsLoading = false.obs;
+  RxInt currentPage = 1.obs;
+  RxInt totalPages = 1.obs;
 
   Utilscontroller get _utils => Get.find<Utilscontroller>();
 
@@ -43,6 +50,7 @@ class Settlementcontroller extends GetxController {
     super.onInit();
     fetchWallet();
     loadExistingBankDetails();
+    fetchSettlements();
   }
 
   // ---------------------------------------------------------
@@ -62,8 +70,7 @@ class Settlementcontroller extends GetxController {
           totalAmount.value = wallet["total_amount"]?.toString() ?? "0";
           withdrawalAmount.value =
               wallet["withdrawal_amount"]?.toString() ?? "0";
-          requestedAmount.value =
-              wallet["requested_amount"]?.toString() ?? "0";
+          requestedAmount.value = wallet["requested_amount"]?.toString() ?? "0";
         }
       },
       onError: (e) {
@@ -126,9 +133,6 @@ class Settlementcontroller extends GetxController {
           "bank_name": bankNameController.text.trim(),
           "account_holder": holderNameController.text.trim(),
           "account_number": accountNumberController.text.trim(),
-          // NOTE: branchController is collected in UI but there is no
-          // "branch" field in the confirmed bank_details schema.
-          
         },
       },
       onSuccess: (data) {
@@ -136,9 +140,10 @@ class Settlementcontroller extends GetxController {
 
         if (bodyStatus) {
           Customalerts.successAlert(
-            title: hasBankDetails.value
-                ? "Bank Account Updated"
-                : "Bank Account Added",
+            title:
+                hasBankDetails.value
+                    ? "Bank Account Updated"
+                    : "Bank Account Added",
             body: "Your bank details have been saved successfully.",
           );
           hasBankDetails.value = true;
@@ -164,7 +169,6 @@ class Settlementcontroller extends GetxController {
 
   // ---------------------------------------------------------
   // WITHDRAW / CREATE SETTLEMENT
-  
   // ---------------------------------------------------------
   createSettlement() async {
     if (doctorId == null) return;
@@ -204,12 +208,10 @@ class Settlementcontroller extends GetxController {
       body: {
         "doctor_id": doctorId,
         "amount": amount,
-        // Hardcoded — no UPI/Bank selector UI exists on Withdraw screen.
         "payment_method": "bank_transfer",
         "note": "",
       },
       onSuccess: (data) {
-        // HTTP was 200-299, but we must still check the body's own status
         final bool bodyStatus = data.data["status"] == true;
 
         if (bodyStatus) {
@@ -219,7 +221,8 @@ class Settlementcontroller extends GetxController {
           );
           withdrawAmountController.clear();
           fetchWallet();
-          Get.back(); // only close screen on genuine success
+          fetchSettlements(); // refresh history after a new withdrawal
+          Get.back();
         } else {
           Customalerts.errorAlert(
             title: "Failed",
@@ -227,7 +230,6 @@ class Settlementcontroller extends GetxController {
                 data.data["message"] ??
                 "Something went wrong. Please try again.",
           );
-          // stay on screen so user can retry
         }
       },
       onError: (e) {
@@ -239,5 +241,49 @@ class Settlementcontroller extends GetxController {
     );
 
     isWithdrawSubmitting.value = false;
+  }
+
+  // ---------------------------------------------------------
+  // FETCH SETTLEMENTS (Payment History) — paginated
+  // ---------------------------------------------------------
+  fetchSettlements({int page = 1}) async {
+    if (doctorId == null) return;
+    isSettlementsLoading.value = true;
+
+    await ApiService.request(
+      endpoint: "settlements/doctor?page=$page&limit=20",
+      method: Api.GET,
+      onSuccess: (data) {
+        final list = data.data["data"] as List<dynamic>?;
+        final meta = data.data["meta"];
+
+        if (list != null) {
+          if (page == 1) {
+            settlementsList.value = list;
+          } else {
+            settlementsList.addAll(list);
+          }
+        }
+
+        if (meta != null) {
+          currentPage.value = meta["currentPage"] ?? 1;
+          totalPages.value = meta["totalPages"] ?? 1;
+        }
+      },
+      onError: (e) {
+        Customalerts.errorAlert(
+          title: "Failed to load history",
+          body: "Please try again.",
+        );
+      },
+    );
+
+    isSettlementsLoading.value = false;
+  }
+
+  loadMoreSettlements() {
+    if (currentPage.value < totalPages.value) {
+      fetchSettlements(page: currentPage.value + 1);
+    }
   }
 }

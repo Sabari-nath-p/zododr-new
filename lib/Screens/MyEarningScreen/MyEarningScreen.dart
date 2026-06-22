@@ -50,7 +50,6 @@ class MyEarningScreen extends StatelessWidget {
                     EarningAnalyticsCard(
                       totalEarnings: controller.totalAmount.value,
                       lastSettlement: controller.lastSettlement.value,
-                      // ⚠️ hardcoded — no API field
                     ),
                     SpacerH(25.h),
                     if (controller.hasBankDetails.value)
@@ -75,9 +74,61 @@ class MyEarningScreen extends StatelessWidget {
                         color: Color(0xFF212121).withOpacity(.7),
                       ),
                     ),
-                    
-                    // No real transactions/settlements list API wired here.
-                    for (int i = 0; i < 10; i++) EarningPaymentCard(),
+
+                    // ---------------------------------------------------
+                    // PAYMENT HISTORY — real settlements data from API
+                    // ---------------------------------------------------
+                    Obx(() {
+                      if (controller.isSettlementsLoading.value &&
+                          controller.settlementsList.isEmpty) {
+                        return Padding(
+                          padding: EdgeInsets.symmetric(vertical: 20.h),
+                          child: Center(child: CircularProgressIndicator()),
+                        );
+                      }
+
+                      if (controller.settlementsList.isEmpty) {
+                        return Padding(
+                          padding: EdgeInsets.symmetric(vertical: 20.h),
+                          child: appText.primaryText(
+                            text: "No payment history yet",
+                            fontSize: 13.sp,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF212121).withOpacity(.5),
+                          ),
+                        );
+                      }
+
+                      final bool canLoadMore =
+                          controller.currentPage.value < controller.totalPages.value;
+
+                      return Column(
+                        children: [
+                          ...controller.settlementsList.map((item) {
+                            return EarningPaymentCard(
+                              amount: item["amount"]?.toString() ?? "0",
+                              paymentMethod:
+                                  item["payment_method"]?.toString() ?? "",
+                              status: item["status"]?.toString() ?? "",
+                              date: _formatDate(
+                                item["request_date"]?.toString(),
+                              ),
+                            );
+                          }),
+                          if (canLoadMore)
+                            Padding(
+                              padding: EdgeInsets.symmetric(vertical: 12.h),
+                              child: TextButton(
+                                onPressed: () =>
+                                    controller.loadMoreSettlements(),
+                                child: Text("Load More"),
+                              ),
+                            ),
+                        ],
+                      );
+                    }),
+
+                    SpacerH(20.h),
                   ],
                 ),
               );
@@ -94,5 +145,19 @@ class MyEarningScreen extends StatelessWidget {
     }
     final last4 = accountNumber.substring(accountNumber.length - 4);
     return "**** **** **** $last4";
+  }
+
+  String _formatDate(String? isoDate) {
+    if (isoDate == null) return "";
+    try {
+      final date = DateTime.parse(isoDate);
+      final months = [
+        "JAN", "FEB", "MAR", "APR", "MAY", "JUN",
+        "JUL", "AUG", "SEP", "OCT", "NOV", "DEC",
+      ];
+      return "${date.day}TH ${months[date.month - 1]}";
+    } catch (e) {
+      return "";
+    }
   }
 }
