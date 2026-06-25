@@ -34,6 +34,11 @@ class CreateSlotController extends GetxController {
   bool notAvailable = false;
 
   List<TimeSlotModel> timeSlots = [];
+  List get offDaySlots =>
+    dateAvailabilities.where((e) => e["not_available"] == true).toList();
+
+List get availableSlots =>
+    dateAvailabilities.where((e) => e["not_available"] != true).toList();
 
   @override
   void onInit() {

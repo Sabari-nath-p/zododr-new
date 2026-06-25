@@ -86,6 +86,8 @@ Widget buildDayCard({
 }
 
 Widget buildTimeSlotTile({
+  Widget? customChild,
+  String? subtitle,
   required String startTime,
   required String endTime,
   VoidCallback? onEdit,
@@ -112,16 +114,32 @@ Widget buildTimeSlotTile({
         ),
 
         const SizedBox(width: 10),
-
         Expanded(
-          child: Text(
-            "$startTime - $endTime",
-            style:  TextStyle(
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w500,
-            ),
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        "$startTime - $endTime",
+        style: TextStyle(
+          fontSize: 14.sp,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+
+      if (subtitle != null) ...[
+        SizedBox(height: 4.h),
+        Text(
+          subtitle,
+          style: TextStyle(
+            color: Colors.red,
+            fontSize: 12.sp,
+            fontWeight: FontWeight.w600,
           ),
         ),
+      ],
+    ],
+  ),
+),
 
         InkWell(
           onTap: onEdit,

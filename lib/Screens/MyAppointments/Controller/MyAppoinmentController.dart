@@ -108,7 +108,7 @@ bool isPrescriptionLoading = false;
 
   fetchBookings(
     status: selected == 0
-        ? "STARTED"
+        ? "ACCEPTED"
         : "COMPLETED",
     date: selectedDate,
   );
@@ -121,7 +121,7 @@ bool isPrescriptionLoading = false;
 
   fetchBookings(
     status: selected == 0
-        ? "STARTED"
+        ? "ACCEPTED"
         : "COMPLETED",
     date: selectedDate,
   );

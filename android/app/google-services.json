@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "380796197825",
+    "project_id": "zodo-ai-dr",
+    "storage_bucket": "zodo-ai-dr.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:380796197825:android:22ac882bfd565480596d40",
+        "android_client_info": {
+          "package_name": "com.example.zodo_dr"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAkLqRymHcmS0b6Wb3v7XOJoZiu8lFeUOo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

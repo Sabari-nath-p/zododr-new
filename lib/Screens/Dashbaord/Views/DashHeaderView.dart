@@ -6,8 +6,10 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zodo_dr/Screens/AuthenticationScreen/AuthenticationScreen.dart';
 import 'package:zodo_dr/Screens/Dashbaord/Controller/HomeController.dart';
+import 'package:zodo_dr/Screens/Notifiactionscreen/NotificationScreen.dart';
 import 'package:zodo_dr/Utils/appText.dart' show appText;
 import 'package:zodo_dr/Utils/utils.dart';
+import 'package:zodo_dr/Screens/Notifiactionscreen/Service/NotiificationController.dart';
 import 'package:zodo_dr/main.dart' as AppRoutes;
 
 class DashHeaderView extends StatelessWidget {
@@ -84,7 +86,67 @@ class DashHeaderView extends StatelessWidget {
   ],
 ),
           SpacerW(12.w),
-          Icon(EvaIcons.bellOutline, size: 28.w, color: Colors.white),
+        GetBuilder<NotificationController>(
+  builder: (notificationCtrl) {
+    return GestureDetector(
+      onTap: () async {
+        await Get.to(
+          () => NotificationScreen(),
+          transition: Transition.rightToLeft,
+          duration: const Duration(milliseconds: 300),
+        );
+
+        /// optional refresh after return
+        notificationCtrl.fetchNotifications();
+      },
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Icon(
+            EvaIcons.bellOutline,
+            size: 28.w,
+            color: Colors.white,
+          ),
+
+          /// ✅ FIX: use unreadCount instead of notificationCount
+          if (notificationCtrl.unreadCount > 0)
+            Positioned(
+              right: -6,
+              top: -6,
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 5.w,
+                  vertical: 2.h,
+                ),
+                constraints: BoxConstraints(
+                  minWidth: 18.w,
+                  minHeight: 18.w,
+                ),
+                decoration: const BoxDecoration(
+                  color: Colors.red,
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Text(
+                    notificationCtrl.unreadCount > 99
+                        ? "99+"
+                        : notificationCtrl.unreadCount.toString(),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 9.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  },
+),
+
+
         ],
       ),
     );

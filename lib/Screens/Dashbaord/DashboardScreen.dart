@@ -14,15 +14,20 @@ import 'package:zodo_dr/Screens/Dashbaord/Views/dbToolCardView.dart';
 import 'package:zodo_dr/Screens/MyAppointments/MyAppoinmentScreens.dart';
 import 'package:zodo_dr/Screens/MyEarningScreen/MyEarningScreen.dart';
 import 'package:zodo_dr/Screens/MyProfileScreen/MyProfileScreen.dart';
+import 'package:zodo_dr/Screens/Notifiactionscreen/Service/NotiificationController.dart';
 import 'package:zodo_dr/Screens/SlotListingScreen/SlotListingScreen.dart';
 import 'package:zodo_dr/Utils/ImagesList.dart';
 import 'package:zodo_dr/Utils/appText.dart';
 import 'package:zodo_dr/Utils/utils.dart';
 import 'package:zodo_dr/Screens/ProfileScreen/ProfileScreen.dart';
-
 class DashBoardScreen extends StatelessWidget {
   DashBoardScreen({super.key});
-  Homecontroller ctrl = Get.put(Homecontroller());
+
+  final Homecontroller ctrl = Get.put(Homecontroller());
+
+  final NotificationController notificationController =
+      Get.put(NotificationController(), permanent: true);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -1,5 +1,7 @@
 import 'dart:developer';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -9,21 +11,50 @@ import 'package:toastification/toastification.dart';
 import 'package:zodo_dr/Screens/AuthenticationScreen/AuthenticationScreen.dart';
 import 'package:zodo_dr/Screens/AuthenticationScreen/VerificationScreen.dart';
 import 'package:zodo_dr/Screens/Dashbaord/DashboardScreen.dart';
+import 'package:zodo_dr/Screens/Notifiactionscreen/Service/Notificationservice.dart';
 import 'package:zodo_dr/Utils/Colors.dart';
 import 'package:zodo_dr/Utils/UtilsController.dart';
+import 'package:zodo_dr/firebase_options.dart';
 
 String login = "";
-void main() async {
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  log("Background message: ${message.notification?.title}");
+}
+
+
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  SharedPreferences pref = await SharedPreferences.getInstance();
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    log("Firebase init error: $e");
+  }
+
+  FirebaseMessaging.onBackgroundMessage(
+    _firebaseMessagingBackgroundHandler,
+  );
+
+  final pref = await SharedPreferences.getInstance();
   login = pref.getString('STATUS') ?? "";
-  log("AUTH TOKEN -->${pref.getString("AUTHKEY") ?? ""}");
+
+  log("AUTH TOKEN --> ${pref.getString("AUTHKEY") ?? ""}");
 
   Get.put(Utilscontroller());
+  NotificationService().init();
 
   runApp(ZodoDoctorApp());
 }
+
+
 class ZodoDoctorApp extends StatelessWidget {
   ZodoDoctorApp({super.key});
 
@@ -33,6 +64,7 @@ class ZodoDoctorApp extends StatelessWidget {
       designSize: Size(390, 844),
       child: ToastificationWrapper(
         child: GetMaterialApp(
+          debugShowCheckedModeBanner: false,
           theme: ThemeData(
             useMaterial3: true,
             appBarTheme: AppBarTheme(

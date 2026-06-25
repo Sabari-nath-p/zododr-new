@@ -25,7 +25,7 @@ class Homecontroller extends GetxController {
   update();
 
   final endpoint =
-      "bookings/doctor/${utils.user!.id}/bookings?page=1&limit=100&appointmentDate=${DateFormat('yyyy-MM-dd').format(DateTime.now())}";
+      "bookings/doctor/${utils.user!.id}/bookings?page=1&limit=100&Date=${DateFormat('yyyy-MM-dd').format(DateTime.now())}";
 
   print(endpoint);
 

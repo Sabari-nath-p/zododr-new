@@ -1,4 +1,4 @@
-package com.example.zodo_dr
+package zodo.dr.app
 
 import io.flutter.embedding.android.FlutterActivity
 

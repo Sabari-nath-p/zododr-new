@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -20,10 +19,7 @@ class SCTimeView extends StatelessWidget {
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildDateSection(controller, context),
-          
-          ],
+          children: [_buildDateSection(controller, context)],
         );
       },
     );
@@ -35,6 +31,7 @@ class SCTimeView extends StatelessWidget {
     BuildContext context,
   ) {
     final slots = controller.dateAvailabilities;
+    
 
     return buildDayCard(
       context: context,
@@ -48,18 +45,11 @@ class SCTimeView extends StatelessWidget {
         );
       },
 
-      timeSlots: _buildSlots(
-        controller,
-        slots,
-        context,
-        SlotMode.date,
-        null,
-      ),
+      timeSlots: _buildSlots(controller, slots, context, SlotMode.date, null),
     );
   }
 
   // ---------------- WEEK ----------------
- 
 
   // ---------------- SLOTS ----------------
   List<Widget> _buildSlots(
@@ -72,65 +62,80 @@ class SCTimeView extends StatelessWidget {
     return List.generate(slots.length, (index) {
       final slot = slots[index];
 
-     final String id = (slot["id"] ?? "").toString();
+      final String id = (slot["id"] ?? "").toString();
 
-      if (slot["not_available"] == true) {
-        return Container(
-          padding: const EdgeInsets.all(16),
-          child: const Row(
-            children: [
-              Icon(Icons.block, color: Colors.red),
-              SizedBox(width: 10),
-              Text(
-                "Doctor Not Available",
-                style: TextStyle(
-                  color: Colors.red,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        );
-      }
+     if (slot["not_available"] == true) {
+  return buildTimeSlotTile(
+    startTime: _formatTime(slot["startTime"]),
+    endTime: _formatTime(slot["endTime"]),
+    subtitle: "🚫 Doctor Not Available",
+    onEdit: () {
+      controller.startTime = _parseTime(slot["startTime"]);
+      controller.endTime = _parseTime(slot["endTime"]);
+      controller.notAvailable = true;
+      controller.update();
+
+      showTimeSlotDialog(
+        context,
+        mode: mode,
+        weekId: weekId,
+        date: controller.selectedDate,
+        isEdit: true,
+        availabilityId: id,
+      );
+    },
+    onDelete: () {
+      showDeleteDialog(
+        context,
+        onDelete: () {
+          controller.deleteAvailability(
+            availabilityId: id,
+            weekId: weekId,
+          );
+        },
+      );
+    },
+  );
+}
 
       return buildTimeSlotTile(
         startTime: _formatTime(slot["startTime"]),
         endTime: _formatTime(slot["endTime"]),
 
         // ---------------- EDIT ----------------
-      onEdit: () {
-  // 1. PREFILL EXISTING VALUES
-  final slot = slots[index];
+        onEdit: () {
+          // 1. PREFILL EXISTING VALUES
+          final slot = slots[index];
 
-  controller.startTime = _parseTime(slot["startTime"]);
-  controller.endTime = _parseTime(slot["endTime"]);
-  controller.notAvailable = slot["not_available"] ?? false;
+          controller.startTime = _parseTime(slot["startTime"]);
+          controller.endTime = _parseTime(slot["endTime"]);
+          controller.notAvailable = slot["not_available"] ?? false;
 
-  controller.update();
+          controller.update();
 
-  // 2. OPEN DIALOG
-  showTimeSlotDialog(
-    context,
-    mode: mode,
-    weekId: weekId,
-    date: controller.selectedDate,
-    isEdit: true,
-    availabilityId: id,
-  );
-},
+          // 2. OPEN DIALOG
+          showTimeSlotDialog(
+            context,
+            mode: mode,
+            weekId: weekId,
+            date: controller.selectedDate,
+            isEdit: true,
+            availabilityId: id,
+          );
+        },
 
         // ---------------- DELETE (FIXED) ----------------
         onDelete: () {
-  showDeleteDialog(
-    context,
-    onDelete: () {
-      controller.deleteAvailability(
-        availabilityId: id,
-        weekId: weekId, // null for date mode, value for week mode
-      );
-    },
-  );
-},
+          showDeleteDialog(
+            context,
+            onDelete: () {
+              controller.deleteAvailability(
+                availabilityId: id,
+                weekId: weekId, // null for date mode, value for week mode
+              );
+            },
+          );
+        },
       );
     });
   }
@@ -151,10 +156,7 @@ class SCTimeView extends StatelessWidget {
 }
 
 /// ================= DELETE DIALOG =================
-void showDeleteDialog(
-  BuildContext context, {
-  required VoidCallback onDelete,
-}) {
+void showDeleteDialog(BuildContext context, {required VoidCallback onDelete}) {
   showDialog(
     context: context,
     builder: (context) {
@@ -179,15 +181,13 @@ void showDeleteDialog(
     },
   );
 }
+
 TimeOfDay _parseTime(String? value) {
   if (value == null || value.isEmpty) return TimeOfDay.now();
 
   try {
     final parts = value.split(":");
-    return TimeOfDay(
-      hour: int.parse(parts[0]),
-      minute: int.parse(parts[1]),
-    );
+    return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
   } catch (_) {
     return TimeOfDay.now();
   }

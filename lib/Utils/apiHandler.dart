@@ -32,13 +32,26 @@ class ApiService {
     Map<String, dynamic>? body,
   }) {
     if (!kDebugMode) return;
+
+    log("");
+    log("══════════════════════════════════════════════");
+    log("🚀 API REQUEST");
+    log("Method : ${method.name.toUpperCase()}");
+    log("URL    : $url");
+
+    log("Headers:");
     headers.forEach((key, value) {
-      _log("  $key : $value");
+      log("$key : $value");
     });
 
     if (body != null) {
-      _log(const JsonEncoder.withIndent("  ").convert(body));
-    } else {}
+      log("Body:");
+      log(const JsonEncoder.withIndent("  ").convert(body));
+    } else {
+      log("Body: None");
+    }
+
+    log("══════════════════════════════════════════════");
   }
 
   static void _logResponse({
@@ -48,15 +61,29 @@ class ApiService {
   }) {
     if (!kDebugMode) return;
 
-    response.headers.forEach((key, value) {});
+    log("");
+    log("══════════════════════════════════════════════");
+    log("✅ API RESPONSE");
+    log("URL        : $url");
+    log("StatusCode : ${response.statusCode}");
+    log("Time       : ${time} ms");
+
+    log("Headers:");
+    response.headers.forEach((key, value) {
+      log("$key : $value");
+    });
+
+    log("Response:");
 
     try {
-      final decoded = json.decode(response.body);
-    } catch (_) {}
-  }
+      final decoded = jsonDecode(response.body);
+      const encoder = JsonEncoder.withIndent("  ");
+      log(encoder.convert(decoded));
+    } catch (_) {
+      log(response.body);
+    }
 
-  static void _logError(dynamic error) {
-    if (!kDebugMode) return;
+    log("══════════════════════════════════════════════");
   }
 
   ///----------------------------------------
@@ -136,7 +163,18 @@ class ApiService {
           break;
       }
 
+      _logRequest(
+        method: method,
+        url: uri,
+        headers: requestHeaders,
+        body: body,
+      );
       stopwatch.stop();
+      _logResponse(
+        url: uri,
+        response: response,
+        time: stopwatch.elapsedMilliseconds,
+      );
 
       final responseData = ResponseModel(
         statusCode: response.statusCode,
